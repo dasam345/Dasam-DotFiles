@@ -152,6 +152,7 @@ sudo pacman -S --noconfirm --needed \
     htop \
     imagemagick \
     pulsemixer \
+    pavucontrol \
     dconf \
     go
 success "Narzędzia systemowe OK"
