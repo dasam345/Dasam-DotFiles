@@ -1,50 +1,62 @@
-@import url("../waybar/colors.css");
-
 * {
-  font-family: "JetBrainsMono Nerd Font";
+  font-family: "JetBrainsMono Nerd Font", monospace;
   font-size: 14px;
 }
 
+:root {
+  color: #dee4e0;
+  background: #0e1513;
+  surface: #0e1513;
+  surface-muted: #171d1b;
+  surface-strong: #252b29;
+  border-strong: rgba(199, 231, 255, 0.12);
+  accent: #85d6c0;
+  accent-strong: #a1f2dc;
+  text-muted: rgba(222, 228, 224, 0.85);
+}
+
 .notification {
-  border-radius: 12px;
-  padding: 2px;
-  margin: 3px;
-  background-color: alpha(@on_secondary_fixed, 0.8);
-  border: 1px solid on_tertiary_container;
+  border-radius: 16px;
+  padding: 10px;
+  margin: 6px;
+  background-color: rgba(7, 32, 26, 0.85);
+  border: 1px solid rgba(199, 231, 255, 0.08);
 }
 
 .notification-content {
-  padding: 2px;
+  padding: 6px 0;
 }
 
 .notification-title {
   font-weight: 600;
   font-size: 11px;
-  color: @on_primary_container;
+  color: #a1f2dc;
 }
 
 .notification-body {
   font-size: 10px;
-  color: alpha(@on_secondary_fixed, 0.85);
+  color: rgba(222, 228, 224, 0.85);
   border-radius: 14px;
 }
 
 .notification-action {
   border-radius: 8px;
-  padding: 2px 3px;
-  margin: 1px;
+  padding: 6px 8px;
+  margin: 4px 2px 0 0;
   font-size: 10px;
+  background-color: rgba(133, 214, 192, 0.14);
+  color: #dee4e0;
 }
 
 .notification-icon {
-  margin-right: 8px;
+  margin-right: 10px;
 }
 
 .control-center {
-  border-radius: 14px;
-  padding: 10px;
-  background-color: alpha(@on_secondary_fixed, 0.7);
-  border: 1px solid alpha(@on_tertiary_container, 0.06);
+  border-radius: 18px;
+  padding: 14px;
+  background-color: rgba(7, 32, 26, 0.88);
+  border: 1px solid rgba(199, 231, 255, 0.08);
 }
 
 .control-center-list {
@@ -81,13 +93,13 @@ button {
 .widget-volume trough {
   min-height: 4px;
   border-radius: 999px;
-  background-color: alpha(on_primary_container, 0.48);
+  background-color: rgba(161, 242, 220, 0.48);
 }
 
 .widget-volume highlight {
   min-height: 4px;
   border-radius: 999px;
-  background-color: @on_primary_container;
+  background-color: #a1f2dc;
 }
 
 .widget-volume slider {
@@ -102,12 +114,12 @@ button {
   margin: 4px;
   border-radius: 12px;
 
-  background-color: alpha(@on_primary_container, 0.07);
-  border: 1px solid alpha(@on_tertiary_container, 0.05);
+  background-color: rgba(161, 242, 220, 0.07);
+  border: 1px solid rgba(199, 231, 255, 0.05);
 }
 
 .widget-buttons-grid button:hover {
-  background-color: alpha(@inverse_surface, 0.16);
+  background-color: rgba(222, 228, 224, 0.16);
 }
 
 .empty {

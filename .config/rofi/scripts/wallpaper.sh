@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # =========================
 # Paths
@@ -6,6 +7,11 @@
 WALL_DIR="$HOME/Wallpapers"
 CACHE="$HOME/.cache/rofi-wallpapers"
 CURRENT_WALL="$HOME/.cache/current_wallpaper"
+
+if ! command -v swww >/dev/null 2>&1; then
+    notify-send "Wallpaper error" "swww is not installed. Install swww and try again."
+    exit 1
+fi
 
 mkdir -p "$CACHE"
 
@@ -58,19 +64,16 @@ RANDOM_POS="$(awk 'BEGIN {
 # =========================
 # Wallpaper change (SINGLE GROW)
 # =========================
-if command -v swww >/dev/null 2>&1; then
-    if ! pgrep -x swww-daemon >/dev/null 2>&1; then
-        swww-daemon &
-        sleep 0.2
-    fi
-    swww img "$IMG_PATH" \
-        --transition-type grow \
-        --transition-pos "$RANDOM_POS" \
-        --transition-duration 2.8 \
-        --transition-fps 60
-else
-    grim -g "$(slurp)" "$IMG_PATH"
+if ! pgrep -x swww-daemon >/dev/null 2>&1; then
+    swww-daemon &
+    sleep 0.4
 fi
+
+swww img "$IMG_PATH" \
+    --transition-type grow \
+    --transition-pos "$RANDOM_POS" \
+    --transition-duration 2.8 \
+    --transition-fps 60
 
 # =========================
 # Notify

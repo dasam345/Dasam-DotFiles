@@ -168,8 +168,8 @@
         "dnd-inhibited-none": "󰪑"
       },
       "return-type": "json",
-      "exec-if": "which swaync-client",
-      "exec": "swaync-client -swb",
+      "exec-if": "test -x $HOME/.config/waybar/scripts/notification-status.sh",
+      "exec": "$HOME/.config/waybar/scripts/notification-status.sh",
       "on-click": "swaync-client -t -sw",
       "on-click-right": "swaync-client -d -sw",
       "escape": true
