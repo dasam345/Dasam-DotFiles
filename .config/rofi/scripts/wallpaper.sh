@@ -58,11 +58,19 @@ RANDOM_POS="$(awk 'BEGIN {
 # =========================
 # Wallpaper change (SINGLE GROW)
 # =========================
-swww img "$IMG_PATH" \
-    --transition-type grow \
-    --transition-pos "$RANDOM_POS" \
-    --transition-duration 2.8 \
-    --transition-fps 60
+if command -v swww >/dev/null 2>&1; then
+    if ! pgrep -x swww-daemon >/dev/null 2>&1; then
+        swww-daemon &
+        sleep 0.2
+    fi
+    swww img "$IMG_PATH" \
+        --transition-type grow \
+        --transition-pos "$RANDOM_POS" \
+        --transition-duration 2.8 \
+        --transition-fps 60
+else
+    grim -g "$(slurp)" "$IMG_PATH"
+fi
 
 # =========================
 # Notify

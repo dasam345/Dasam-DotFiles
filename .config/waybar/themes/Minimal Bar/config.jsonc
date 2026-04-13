@@ -21,8 +21,7 @@
 	}, 
 
     "clock": {
-        "format": " {:%I:%M %p}", // AM PM format
-        //"format": "  {:%H:%M}",// 24H
+        "format": " {:%H:%M}", // 24H
         "format-alt": " {:%A  %e %B}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
@@ -52,8 +51,8 @@
 
     "pulseaudio": {
     "format": "{icon} {volume}%",
-    "on-click": "pulsemixer",
-    "on-click-right": "pulsemixer",
+    "on-click": "pavucontrol",
+    "on-click-right": "pavucontrol",
     "tooltip-format": "Playing at {volume}%",
     "scroll-step": 5,
     "format-muted": "",
