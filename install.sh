@@ -6,34 +6,24 @@
 
 set -e
 
-# Kolory
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-NC='\033[0m'
+RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
+BLUE='\033[0;34m'; CYAN='\033[0;36m'; NC='\033[0m'
 
 info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
 success() { echo -e "${GREEN}[OK]${NC}   $1"; }
 warn()    { echo -e "${YELLOW}[WARN]${NC} $1"; }
-error()   { echo -e "${RED}[ERR]${NC}  $1"; }
 header()  { echo -e "\n${CYAN}══════════════════════════════════════${NC}"; echo -e "${CYAN} $1${NC}"; echo -e "${CYAN}══════════════════════════════════════${NC}"; }
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ────────────────────────────────────────────────────────────────
 header "1. Aktualizacja systemu"
-# ────────────────────────────────────────────────────────────────
-info "Aktualizowanie pakietów..."
 sudo pacman -Syu --noconfirm
 success "System zaktualizowany"
 
 # ────────────────────────────────────────────────────────────────
 header "2. Instalacja yay (AUR helper)"
-# ────────────────────────────────────────────────────────────────
 if ! command -v yay &>/dev/null; then
-    info "Instalowanie yay..."
     sudo pacman -S --noconfirm --needed base-devel git
     git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin
     cd /tmp/yay-bin && makepkg -si --noconfirm
@@ -44,224 +34,122 @@ else
 fi
 
 # ────────────────────────────────────────────────────────────────
-header "3. Pakiety Hyprland (core)"
+header "3. Włączanie multilib (wymagane dla lib32-*)"
+if ! grep -q "^\[multilib\]" /etc/pacman.conf; then
+    info "Włączanie multilib..."
+    sudo sed -i '/^#\[multilib\]/{s/^#//;n;s/^#//}' /etc/pacman.conf
+    sudo pacman -Sy --noconfirm
+    success "multilib włączony"
+else
+    success "multilib już włączony"
+fi
+
 # ────────────────────────────────────────────────────────────────
-PKGS_CORE=(
-    hyprland
-    hyprlock
-    hypridle
-    hyprpicker
-    xdg-desktop-portal-hyprland
-    xdg-desktop-portal-gtk
-    polkit-gnome
-    qt5-wayland
+header "4. Hyprland core"
+sudo pacman -S --noconfirm --needed \
+    hyprland \
+    hyprlock \
+    hypridle \
+    hyprpicker \
+    xdg-desktop-portal-hyprland \
+    xdg-desktop-portal-gtk \
+    polkit-gnome \
+    qt5-wayland \
     qt6-wayland
-)
-
-info "Instalowanie: core Hyprland..."
-sudo pacman -S --noconfirm --needed "${PKGS_CORE[@]}"
-success "Core OK"
-
-# ────────────────────────────────────────────────────────────────
-header "4. Pakiety UI / bar / notyfikacje"
-# ────────────────────────────────────────────────────────────────
-PKGS_UI=(
-    waybar
-)
-
-info "Instalowanie: UI (pacman)..."
-sudo pacman -S --noconfirm --needed "${PKGS_UI[@]}"
-success "UI OK"
+success "Hyprland core OK"
 
 # ────────────────────────────────────────────────────────────────
 header "5. Terminal i shell"
-# ────────────────────────────────────────────────────────────────
-PKGS_SHELL=(
-    kitty
-    zsh
-    zsh-completions
-    zsh-autosuggestions
-    zsh-syntax-highlighting
-    starship         # prompt (opcjonalne)
-)
-
-info "Instalowanie: terminal/shell..."
-sudo pacman -S --noconfirm --needed "${PKGS_SHELL[@]}"
+sudo pacman -S --noconfirm --needed \
+    kitty \
+    zsh \
+    zsh-completions \
+    zsh-autosuggestions \
+    zsh-syntax-highlighting \
+    starship
 
 if [ "$SHELL" != "$(which zsh)" ]; then
     info "Ustawianie zsh jako domyślny shell..."
     chsh -s "$(which zsh)"
 fi
-success "Shell OK"
+success "Terminal/shell OK"
 
 # ────────────────────────────────────────────────────────────────
 header "6. Audio (Pipewire)"
-# ────────────────────────────────────────────────────────────────
-PKGS_AUDIO=(
-    pipewire
-    pipewire-pulse
-    pipewire-alsa
-    pipewire-jack
-    wireplumber
-    pamixer
-    playerctl
+sudo pacman -S --noconfirm --needed \
+    pipewire \
+    pipewire-pulse \
+    pipewire-alsa \
+    pipewire-jack \
+    wireplumber \
+    pamixer \
+    playerctl \
     pavucontrol
-)
 
-info "Instalowanie: audio..."
-sudo pacman -S --noconfirm --needed "${PKGS_AUDIO[@]}"
+systemctl --user enable --now pipewire pipewire-pulse wireplumber 2>/dev/null || true
 success "Audio OK"
 
 # ────────────────────────────────────────────────────────────────
 header "7. Screenshot / nagrywanie"
-# ────────────────────────────────────────────────────────────────
-PKGS_CAPTURE=(
-    grim
-    slurp
-    wl-clipboard
+sudo pacman -S --noconfirm --needed \
+    grim \
+    slurp \
+    wl-clipboard \
     wf-recorder
-)
-
-info "Instalowanie: capture tools..."
-sudo pacman -S --noconfirm --needed "${PKGS_CAPTURE[@]}"
-success "Capture OK"
+success "Capture tools OK"
 
 # ────────────────────────────────────────────────────────────────
-header "8. AMD GPU – sterowniki (RX 9060 XT)"
-# ────────────────────────────────────────────────────────────────
-# Włącz multilib w pacman.conf (potrzebne dla lib32-*)
-if ! grep -q "^\[multilib\]" /etc/pacman.conf; then
-    info "Włączanie multilib w pacman.conf..."
-    sudo sed -i '/^#\[multilib\]/,/^#Include/ s/^#//' /etc/pacman.conf
-    sudo pacman -Sy
-fi
-# ────────────────────────────────────────────────────────────────
-PKGS_AMD=(
-    mesa
-    vulkan-radeon
-    libva-mesa-driver
-    mesa-vdpau
-    lib32-mesa               # dla Steam/Wine
-    lib32-vulkan-radeon      # dla Steam/Wine
+header "8. AMD GPU sterowniki (RX 9060 XT)"
+# UWAGA: mesa-vdpau NIE jest osobnym pakietem – jest częścią mesa
+# lib32-libva-mesa-driver dostarcza VA-API dla 32bit (Steam)
+sudo pacman -S --noconfirm --needed \
+    mesa \
+    vulkan-radeon \
+    libva-mesa-driver \
+    lib32-mesa \
+    lib32-vulkan-radeon \
+    lib32-libva-mesa-driver \
     vulkan-tools
-)
-
-info "Instalowanie: AMD GPU sterowniki..."
-sudo pacman -S --noconfirm --needed "${PKGS_AMD[@]}"
 success "AMD GPU OK"
 
 # ────────────────────────────────────────────────────────────────
-header "9. Czcionki"
-# ────────────────────────────────────────────────────────────────
-PKGS_FONTS=(
-    ttf-jetbrains-mono-nerd
-    noto-fonts
-    noto-fonts-emoji
-    ttf-font-awesome
-)
+header "9. Waybar"
+sudo pacman -S --noconfirm --needed waybar
+success "Waybar OK"
 
-info "Instalowanie: czcionki..."
-sudo pacman -S --noconfirm --needed "${PKGS_FONTS[@]}"
+# ────────────────────────────────────────────────────────────────
+header "10. Czcionki"
+sudo pacman -S --noconfirm --needed \
+    ttf-jetbrains-mono-nerd \
+    noto-fonts \
+    noto-fonts-emoji \
+    ttf-font-awesome
 success "Czcionki OK"
 
 # ────────────────────────────────────────────────────────────────
-header "10. Narzędzia systemowe"
-# ────────────────────────────────────────────────────────────────
-PKGS_SYS=(
-    nautilus          # file manager
-    firefox
-    brightnessctl     # jasność (dla laptopów; bezpieczne też na desktop)
-    network-manager-applet
-    blueman
-    fastfetch
-    nwg-look          # GTK theming dla Waylanda
-    qt5ct
-    qt6ct
-    xdg-utils
-    udiskie           # auto-mount USB
-    ntfs-3g           # NTFS support (ważne dla ciebie!)
-)
-
-info "Instalowanie: narzędzia systemowe..."
-sudo pacman -S --noconfirm --needed "${PKGS_SYS[@]}"
-success "Narzędzia OK"
+header "11. Narzędzia systemowe"
+sudo pacman -S --noconfirm --needed \
+    nautilus \
+    firefox \
+    brightnessctl \
+    network-manager-applet \
+    blueman \
+    fastfetch \
+    qt5ct \
+    qt6ct \
+    xdg-utils \
+    udiskie \
+    ntfs-3g \
+    htop
+success "Narzędzia systemowe OK"
 
 # ────────────────────────────────────────────────────────────────
-header "11. Pakiety AUR"
-# ────────────────────────────────────────────────────────────────
-PKGS_AUR=(
-    swww           # animowane tapety (AUR)
-    swaync         # notification center (AUR)
-    swayosd        # OSD głośności (AUR)
-    rofi-wayland   # launcher (AUR)
-    wlogout        # menu wylogowania (AUR)
-    matugen        # generowanie kolorów z tapety (AUR)
-    hyprshot       # screenshot tool (AUR)
-    nwg-look       # GTK theming (AUR)
-)
-
-info "Instalowanie: pakiety AUR..."
-yay -S --noconfirm --needed "${PKGS_AUR[@]}" || warn "Niektóre pakiety AUR mogły nie zainstalować się — sprawdź ręcznie"
-success "AUR OK"
-
-# ────────────────────────────────────────────────────────────────
-header "12. Kopiowanie dotfiles"
-# ────────────────────────────────────────────────────────────────
-info "Kopiowanie konfiguracji..."
-
-# Backup istniejących configów
-BACKUP_DIR="$HOME/.config-backup-$(date +%Y%m%d-%H%M%S)"
-if [ -d "$HOME/.config/hypr" ]; then
-    warn "Znaleziono istniejący ~/.config/hypr — backup → $BACKUP_DIR"
-    mkdir -p "$BACKUP_DIR"
-    cp -r "$HOME/.config/hypr" "$BACKUP_DIR/" 2>/dev/null || true
-    cp -r "$HOME/.config/waybar" "$BACKUP_DIR/" 2>/dev/null || true
-fi
-
-# Kopiowanie .config
-cp -r "$DOTFILES_DIR/.config/"* "$HOME/.config/"
-success "Pliki .config skopiowane"
-
-# Kopiowanie .local
-cp -r "$DOTFILES_DIR/.local/"* "$HOME/.local/"
-success "Pliki .local skopiowane"
-
-# Kopiowanie plików z katalogu domowego
-[ -f "$DOTFILES_DIR/.zshrc" ]   && cp "$DOTFILES_DIR/.zshrc" "$HOME/.zshrc"   && success ".zshrc"
-[ -f "$DOTFILES_DIR/.rec.sh" ]  && cp "$DOTFILES_DIR/.rec.sh" "$HOME/.rec.sh" && success ".rec.sh"
-
-# ────────────────────────────────────────────────────────────────
-header "13. Uprawnienia do skryptów"
-# ────────────────────────────────────────────────────────────────
-info "Nadawanie uprawnień wykonywalnych..."
-find "$HOME/.config/hypr/scripts" -name "*.sh" -exec chmod +x {} \;
-find "$HOME/.config/hypr/lockscripts" -name "*.sh" -exec chmod +x {} \;
-find "$HOME/.config/waybar/scripts" -name "*.sh" -exec chmod +x {} \;
-find "$HOME/.config/rofi/scripts" -name "*.sh" -exec chmod +x {} \;
-[ -f "$HOME/.rec.sh" ] && chmod +x "$HOME/.rec.sh"
-success "Uprawnienia nadane"
-
-# ────────────────────────────────────────────────────────────────
-header "14. Montowanie NTFS (fstab)"
-# ────────────────────────────────────────────────────────────────
-warn "Jeśli chcesz auto-mount dysku NTFS, dodaj do /etc/fstab:"
-echo -e "  UUID=<twoje_UUID>  /mnt/windows  ntfs-3g  uid=\$(id -u),gid=\$(id -g),defaults  0  0"
-echo -e "  Użyj: sudo blkid | grep ntfs   aby znaleźć UUID"
-
-# ────────────────────────────────────────────────────────────────
-header "15. greetd – autologin z hyprlock zamiast ekranu logowania"
-# ────────────────────────────────────────────────────────────────
-# Zamiast SDDM/GDM używamy greetd z autologinem.
-# Hyprland startuje automatycznie, hyprlock pojawia się jako "ekran logowania".
-
-if ! command -v greetd &>/dev/null; then
-    info "Instalowanie greetd..."
-    sudo pacman -S --noconfirm --needed greetd
-fi
+header "12. greetd – autologin (zastępuje SDDM/GDM)"
+sudo pacman -S --noconfirm --needed greetd
 
 CURRENT_USER=$(whoami)
+info "Konfigurowanie autologin dla: $CURRENT_USER"
 
-info "Konfigurowanie greetd autologin dla użytkownika: $CURRENT_USER"
 sudo mkdir -p /etc/greetd
 sudo tee /etc/greetd/config.toml > /dev/null << EOF
 [terminal]
@@ -278,36 +166,113 @@ EOF
 
 sudo systemctl enable greetd
 sudo systemctl disable sddm gdm lightdm ly 2>/dev/null || true
+success "greetd autologin skonfigurowany"
 
-success "greetd skonfigurowany – autologin do Hyprland, hyprlock pojawia się przy starcie"
-warn "Jeśli używałeś innego DM – sprawdź czy jest wyłączony: systemctl list-units --type=service | grep dm"
 # ────────────────────────────────────────────────────────────────
-info "Instalowanie PixelifySans z dotfiles..."
-cp -r "$DOTFILES_DIR/.local/share/fonts/"* "$HOME/.local/share/fonts/" 2>/dev/null || true
+header "13. Pakiety AUR"
+# nwg-look, swww, swaync, swayosd, rofi-wayland, wlogout, matugen – wszystkie AUR
+yay -S --noconfirm --needed \
+    swww \
+    swaync \
+    swayosd \
+    rofi-wayland \
+    wlogout \
+    matugen \
+    nwg-look
+success "AUR OK"
+
+# ────────────────────────────────────────────────────────────────
+header "14. Kopiowanie dotfiles"
+info "Kopiowanie konfiguracji..."
+
+BACKUP_DIR="$HOME/.config-backup-$(date +%Y%m%d-%H%M%S)"
+if [ -d "$HOME/.config/hypr" ]; then
+    warn "Backup istniejącego .config → $BACKUP_DIR"
+    mkdir -p "$BACKUP_DIR"
+    for dir in hypr waybar rofi swaync kitty; do
+        cp -r "$HOME/.config/$dir" "$BACKUP_DIR/" 2>/dev/null || true
+    done
+fi
+
+mkdir -p "$HOME/.config"
+mkdir -p "$HOME/.local/share/fonts"
+mkdir -p "$HOME/.local/share/rofi/themes"
+
+cp -r "$DOTFILES_DIR/.config/"* "$HOME/.config/"
+cp -r "$DOTFILES_DIR/.local/"*  "$HOME/.local/"
+
+[ -f "$DOTFILES_DIR/.zshrc" ]  && cp "$DOTFILES_DIR/.zshrc"  "$HOME/.zshrc"
+[ -f "$DOTFILES_DIR/.rec.sh" ] && cp "$DOTFILES_DIR/.rec.sh" "$HOME/.rec.sh"
+success "Dotfiles skopiowane"
+
+# ────────────────────────────────────────────────────────────────
+header "15. chmod +x dla wszystkich skryptów .sh"
+info "Nadawanie uprawnień wykonywalnych..."
+
+# Globalnie – każdy .sh w .config i .local
+find "$HOME/.config" -name "*.sh" -exec chmod +x {} \;
+find "$HOME/.local"  -name "*.sh" -exec chmod +x {} \;
+[ -f "$HOME/.rec.sh" ] && chmod +x "$HOME/.rec.sh"
+
+# Dodatkowo explicite każdy znany skrypt
+SCRIPTS=(
+    "$HOME/.config/hypr/scripts/osd.sh"
+    "$HOME/.config/hypr/scripts/screenshot.sh"
+    "$HOME/.config/hypr/scripts/colorpick.sh"
+    "$HOME/.config/hypr/scripts/screenrec.sh"
+    "$HOME/.config/hypr/scripts/mpris_osd.sh"
+    "$HOME/.config/hypr/lockscripts/mpris.sh"
+    "$HOME/.config/waybar/scripts/reloadwb.sh"
+    "$HOME/.config/rofi/scripts/wallpaper.sh"
+    "$HOME/.config/rofi/scripts/wbswitcher.sh"
+    "$HOME/.config/rofi/scripts/emoji-picker.sh"
+    "$HOME/.config/rofi/scripts/icon-picker.sh"
+    "$HOME/.config/rofi/scripts/menu.sh"
+    "$HOME/.config/rofi/scripts/about.sh"
+    "$HOME/.config/rofi/scripts/genrate-icons.sh"
+)
+
+for script in "${SCRIPTS[@]}"; do
+    if [ -f "$script" ]; then
+        chmod +x "$script"
+        success "chmod +x $(basename "$script")"
+    else
+        warn "Nie znaleziono: $script"
+    fi
+done
+
+# ────────────────────────────────────────────────────────────────
+header "16. Odświeżanie cache czcionek"
 fc-cache -fv &>/dev/null
 success "Cache czcionek odświeżony"
 
 # ────────────────────────────────────────────────────────────────
-header "✅ Instalacja zakończona!"
+header "17. Info o montowaniu NTFS"
+warn "Jeśli chcesz auto-mount dysku NTFS, dodaj do /etc/fstab:"
+echo "  UUID=<twoje_UUID>  /mnt/windows  ntfs-3g  uid=$(id -u),gid=$(id -g),defaults  0  0"
+echo "  Znajdź UUID: sudo blkid | grep ntfs"
+
 # ────────────────────────────────────────────────────────────────
+header "✅ Gotowe!"
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║  Dotfiles zainstalowane pomyślnie!               ║${NC}"
 echo -e "${GREEN}╚══════════════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "${YELLOW}Następne kroki:${NC}"
-echo "  1. Uruchom ponownie: reboot"
-echo "  2. Zaloguj się do sesji Hyprland"
-echo "  3. Ustaw tapetę: CTRL+SPACE"
-echo "  4. Wygeneruj kolory matugenem: matugen image ~/ścieżka/do/tapety.jpg"
-echo "  5. Przełącz motyw Waybar: SUPER+SHIFT+W"
+echo "  1. reboot"
+echo "  2. Hyprland wystartuje automatycznie"
+echo "  3. hyprlock pojawi się od razu (wpisz hasło)"
+echo "  4. CTRL+SPACE → wybierz tapetę"
+echo "  5. matugen image ~/tapeta.jpg → wygeneruj kolory"
+echo "  6. SUPER+SHIFT+W → zmień motyw Waybar"
 echo ""
-echo -e "${YELLOW}Skróty klawiszowe:${NC}"
-echo "  SUPER+ENTER       → Terminal (kitty)"
-echo "  SUPER+SPACE       → Launcher (rofi)"
-echo "  SUPER+Q           → Zamknij okno"
-echo "  SUPER+L           → Zablokuj ekran"
-echo "  SUPER+X           → Wyloguj/wyłącz"
-echo "  SUPER+SHIFT+S     → Screenshot"
-echo "  CTRL+SPACE        → Wybór tapety"
+echo -e "${YELLOW}Skróty:${NC}"
+echo "  SUPER+ENTER  → kitty"
+echo "  SUPER+SPACE  → rofi"
+echo "  SUPER+Q      → zamknij okno"
+echo "  SUPER+L      → hyprlock"
+echo "  SUPER+X      → wlogout"
+echo "  SUPER+PRINT  → screenshot"
+echo "  CTRL+SPACE   → tapeta"
 echo ""
