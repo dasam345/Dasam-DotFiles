@@ -168,10 +168,10 @@
         "dnd-inhibited-none": "󰪑"
       },
       "return-type": "json",
-      "exec-if": "test -x $HOME/.config/waybar/scripts/notification-status.sh",
+      "exec-if": "command -v swaync-client >/dev/null 2>&1",
       "exec": "$HOME/.config/waybar/scripts/notification-status.sh",
-      "on-click": "swaync-client -t -sw",
-      "on-click-right": "swaync-client -d -sw",
+      "on-click": "bash -lc 'command -v swaync-client >/dev/null 2>&1 && swaync-client -t -sw || notify-send \"SwayNC unavailable\"'",
+      "on-click-right": "bash -lc 'command -v swaync-client >/dev/null 2>&1 && swaync-client -d -sw || notify-send \"SwayNC unavailable\"'",
       "escape": true
     },
 

@@ -8,9 +8,13 @@ WALL_DIR="$HOME/Wallpapers"
 CACHE="$HOME/.cache/rofi-wallpapers"
 CURRENT_WALL="$HOME/.cache/current_wallpaper"
 
-if ! command -v swww >/dev/null 2>&1; then
-    notify-send "Wallpaper error" "swww is not installed. Install swww and try again."
-    exit 1
+if command -v swww >/dev/null 2>&1; then
+    WALLPAPER_BACKEND="swww"
+elif command -v swaybg >/dev/null 2>&1; then
+    WALLPAPER_BACKEND="swaybg"
+else
+    notify-send "Wallpaper error" "Neither swww nor swaybg is installed. Wallpaper picker disabled."
+    exit 0
 fi
 
 mkdir -p "$CACHE"
@@ -64,16 +68,21 @@ RANDOM_POS="$(awk 'BEGIN {
 # =========================
 # Wallpaper change (SINGLE GROW)
 # =========================
-if ! pgrep -x swww-daemon >/dev/null 2>&1; then
-    swww-daemon &
-    sleep 0.4
-fi
+if [ "$WALLPAPER_BACKEND" = "swww" ]; then
+    if ! pgrep -x swww-daemon >/dev/null 2>&1; then
+        swww-daemon &
+        sleep 0.4
+    fi
 
-swww img "$IMG_PATH" \
-    --transition-type grow \
-    --transition-pos "$RANDOM_POS" \
-    --transition-duration 2.8 \
-    --transition-fps 60
+    swww img "$IMG_PATH" \
+        --transition-type grow \
+        --transition-pos "$RANDOM_POS" \
+        --transition-duration 2.8 \
+        --transition-fps 60
+else
+    pkill swaybg 2>/dev/null || true
+    swaybg -i "$IMG_PATH" -m fill &
+fi
 
 # =========================
 # Notify
