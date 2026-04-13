@@ -72,6 +72,14 @@ if [ "$SHELL" != "$(which zsh)" ]; then
     info "Ustawianie zsh jako domyślny shell..."
     chsh -s "$(which zsh)"
 fi
+
+# Oh My Zsh
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    info "Instalacja Oh My Zsh..."
+    git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
+fi
+
 success "Terminal/shell OK"
 
 # ────────────────────────────────────────────────────────────────
@@ -131,6 +139,7 @@ header "11. Narzędzia systemowe"
 sudo pacman -S --noconfirm --needed \
     nautilus \
     firefox \
+    steam \
     brightnessctl \
     network-manager-applet \
     blueman \
@@ -140,7 +149,11 @@ sudo pacman -S --noconfirm --needed \
     xdg-utils \
     udiskie \
     ntfs-3g \
-    htop
+    htop \
+    imagemagick \
+    pulsemixer \
+    dconf \
+    go
 success "Narzędzia systemowe OK"
 
 # ────────────────────────────────────────────────────────────────
@@ -175,7 +188,7 @@ sudo systemctl enable --force greetd
 success "greetd autologin skonfigurowany"
 # ────────────────────────────────────────────────────────────────
 header "13. Pakiety AUR"
-# nwg-look, swww, swaync, swayosd, rofi-wayland, wlogout, matugen – wszystkie AUR
+# nwg-look, swww, swaync, swayosd, rofi-wayland, wlogout, matugen, discord – wszystkie AUR
 yay -S --noconfirm --needed \
     swww \
     swaync \
@@ -183,7 +196,8 @@ yay -S --noconfirm --needed \
     rofi-wayland \
     wlogout \
     matugen \
-    nwg-look
+    nwg-look \
+    discord
 success "AUR OK"
 
 # ────────────────────────────────────────────────────────────────
@@ -208,6 +222,10 @@ cp -r "$DOTFILES_DIR/.local/"*  "$HOME/.local/"
 
 [ -f "$DOTFILES_DIR/.zshrc" ]  && cp "$DOTFILES_DIR/.zshrc"  "$HOME/.zshrc"
 [ -f "$DOTFILES_DIR/.rec.sh" ] && cp "$DOTFILES_DIR/.rec.sh" "$HOME/.rec.sh"
+
+# Utwórz katalog na tapety
+mkdir -p "$HOME/Wallpapers"
+
 success "Dotfiles skopiowane"
 
 # ────────────────────────────────────────────────────────────────

@@ -48,6 +48,8 @@ chmod +x install.sh
 | **Waybar** | Pasek stanu (2 motywy: Material Pills / Minimal Bar) |
 | **SwayNC** | Centrum powiadomień |
 | **SwayOSD** | OSD dla głośności |
+| **Oh My Zsh** | Shell z Powerlevel10k |
+| **Fastfetch** | System info w terminalu |
 | **Kitty** | Terminal GPU-accelerated |
 | **Rofi** | Launcher + wallpaper picker + emoji/icon picker |
 | **Matugen** | Generowanie kolorów z tapety |
@@ -63,21 +65,35 @@ chmod +x install.sh
 |-------|-------|
 | `SUPER + ENTER` | Terminal (kitty) |
 | `SUPER + SPACE` | Launcher (rofi) |
-| `SUPER + W` | Zamknij okno |
+| `SUPER + Q` | Zamknij okno |
 | `SUPER + T` | Floating toggle |
 | `SUPER + L` | Zablokuj ekran |
 | `SUPER + X` | Wyloguj / wyłącz |
-| `SUPER + E` | Menedżer plików |
-| `SUPER + SHIFT + B` | Firefox |
+| `SUPER + E` | Menedżer plików (Dolphin) |
+| `SUPER + B` | Firefox |
 | `SUPER + D` | Discord |
-| `SUPER + PRINT` | Screenshot |
+| `SUPER + SHIFT + S` | Screenshot |
 | `CTRL + SPACE` | Wybór tapety |
 | `SUPER + SHIFT + W` | Zmień motyw Waybar |
 | `SUPER + SHIFT + E` | Emoji picker |
 | `SUPER + SHIFT + I` | Icon picker |
 | `SUPER + 1-9` | Przełącz workspace |
 | `SUPER + SHIFT + 1-9` | Przenieś okno do workspace |
-| `SUPER + S` | Scratchpad toggle |
+| `SUPER + ALT + S` | Przenieś do scratchpad |
+| XF86AudioRaiseVolume | Głośność + (OSD) |
+| XF86AudioLowerVolume | Głośność - (OSD) |
+
+
+## Problemy i rozwiązania
+
+Jeśli napotkasz problemy po instalacji:
+
+- **Oh My Zsh błąd**: Uruchom `git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh` i `git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k`
+- **OSD głośności nie działa**: Sprawdź czy swayosd-server jest uruchomiony (`ps aux | grep swayosd`)
+- **Powiadomienia nie działają**: Sprawdź konfigurację swaync i env XDG_DATA_DIRS
+- **Wallpaper skrypt nie działa**: Upewnij się, że masz tapety w ~/Wallpapers i imagemagick zainstalowane
+- **Menu dźwięku w Waybar**: Używa pulsemixer, zainstalowane automatycznie
+
 
 ## Kredyty
 
