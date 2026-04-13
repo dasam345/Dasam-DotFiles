@@ -17,9 +17,11 @@ header()  { echo -e "\n${CYAN}════════════════�
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ────────────────────────────────────────────────────────────────
-header "1. Aktualizacja systemu"
+header "1. Aktualizacja mirrorlisty i systemu"
+sudo pacman -S --noconfirm --needed reflector || true
+sudo reflector --country Poland --protocol https --latest 20 --sort rate --save /etc/pacman.d/mirrorlist || true
 sudo pacman -Syu --noconfirm
-success "System zaktualizowany"
+success "Mirrorlista i system zaktualizowane"
 
 # ────────────────────────────────────────────────────────────────
 header "2. Instalacja yay (AUR helper)"
