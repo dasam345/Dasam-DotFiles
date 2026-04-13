@@ -1,17 +1,3 @@
-Prompt do claude jak wkońcu ogarnie dupe: 
-zaktualizowałem troche skrypt oraz konfig hyprland.conf oraz keybinds natomiast przyuważyłem ze nie działa mi pare rzeczy. 
-
-/home/dasam/.zshrc:source:82: no such file or directory: /home/dasam/.oh-my-zsh/oh-my-zsh.sh podczas odpalania terminala kitty pokazuje mi sie cos takiego to jest prawdopodobnie dla tego ze miałem wrzucony tam skrypt od tego ze na odpalenie kitty automatycznie odpala sie fastfetch
-
-menu kontroli dzwięku na waybarze nie działa
-
-menu powiadomień kompletnie nie działa oraz powiadomienia są z podstawowego hyprlanda nie zmienione
-
-skrypt od ustawiania tapet kompletnie nie działa i pokazują sie puste kafelki bez obrazu oraz obraz po wybraniu jakiekolwiek sie nie zmienia
-
-
-
-
 # Dasam DotFiles
 
 Personal Hyprland rice for Arch Linux.
