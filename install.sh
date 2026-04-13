@@ -150,6 +150,7 @@ sudo pacman -S --noconfirm --needed greetd
 CURRENT_USER=$(whoami)
 info "Konfigurowanie autologin dla: $CURRENT_USER"
 
+# Tworzymy konfig
 sudo mkdir -p /etc/greetd
 sudo tee /etc/greetd/config.toml > /dev/null << EOF
 [terminal]
@@ -164,10 +165,14 @@ command = "Hyprland"
 user = "$CURRENT_USER"
 EOF
 
-sudo systemctl enable greetd
+# KLUCZOWA ZMIANA: Najpierw wywalamy stare managery, potem wymuszamy greetd
+info "Usuwanie konfliktów display managerów..."
 sudo systemctl disable sddm gdm lightdm ly 2>/dev/null || true
-success "greetd autologin skonfigurowany"
 
+# Używamy --force, żeby nadpisać symlink /etc/systemd/system/display-manager.service
+sudo systemctl enable --force greetd
+
+success "greetd autologin skonfigurowany"
 # ────────────────────────────────────────────────────────────────
 header "13. Pakiety AUR"
 # nwg-look, swww, swaync, swayosd, rofi-wayland, wlogout, matugen – wszystkie AUR
