@@ -1,0 +1,6 @@
+2026-02-07 14:43:04.727 [info] Started local extension host with pid 63745.
+2026-02-07 14:43:04.741 [info] Started initializing default profile extensions in extensions installation folder. file:///home/dasam/.vscode/extensions
+2026-02-07 14:43:04.855 [info] Completed initializing default profile extensions in extensions installation folder. file:///home/dasam/.vscode/extensions
+2026-02-07 14:43:05.156 [info] MCP Registry configured: https://api.mcp.github.com
+2026-02-07 14:43:05.214 [info] Settings Sync: Account status changed from uninitialized to unavailable
+2026-02-07 14:43:07.592 [info] [perf] Render performance baseline is 13ms
