@@ -190,10 +190,31 @@ sudo systemctl enable --force greetd
 
 success "greetd autologin skonfigurowany"
 # ────────────────────────────────────────────────────────────────
-header "13. Pakiety AUR"
-# nwg-look, swww, swaync, swayosd, rofi-wayland, wlogout, matugen, discord – wszystkie AUR
+header "13. Instalacja swww z repozytorium"
+sudo pacman -S --noconfirm --needed \
+    git \
+    meson \
+    ninja \
+    wayland \
+    wayland-protocols \
+    libxkbcommon \
+    pkgconf \
+    libevdev \
+    libdrm
+
+rm -rf /tmp/swww
+git clone --depth=1 https://github.com/ammen99/swww.git /tmp/swww
+cd /tmp/swww
+meson setup build
+ninja -C build
+sudo ninja -C build install
+cd "$DOTFILES_DIR"
+success "swww zainstalowany"
+
+# ────────────────────────────────────────────────────────────────
+header "14. Pakiety AUR"
+# nwg-look, swaync, swayosd, rofi-wayland, wlogout, matugen, discord – wszystkie AUR
 yay -S --noconfirm --needed \
-    swww \
     swaync \
     swayosd \
     rofi-wayland \
@@ -204,7 +225,7 @@ yay -S --noconfirm --needed \
 success "AUR OK"
 
 # ────────────────────────────────────────────────────────────────
-header "14. Kopiowanie dotfiles"
+header "15. Kopiowanie dotfiles"
 info "Kopiowanie konfiguracji..."
 
 BACKUP_DIR="$HOME/.config-backup-$(date +%Y%m%d-%H%M%S)"
