@@ -139,9 +139,9 @@ success "Czcionki OK"
 # ────────────────────────────────────────────────────────────────
 header "11. Narzędzia systemowe"
 sudo pacman -S --noconfirm --needed \
-    nautilus \
+    dolphin \
     firefox \
-    steam \
+    steam \\
     brightnessctl \
     network-manager-applet \
     blueman \

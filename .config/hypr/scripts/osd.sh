@@ -41,13 +41,28 @@ send_osd() {
 # ---------------- ACTION ----------------
 case "$1" in
   up)
-    swayosd-client --output-volume raise
+    wpctl set-volume "$SINK" ${STEP}%+
     ;;
   down)
-    swayosd-client --output-volume lower
+    wpctl set-volume "$SINK" ${STEP}%-
     ;;
   mute)
-    swayosd-client --output-volume mute-toggle
+    wpctl set-mute "$SINK" toggle
     ;;
 esac
+# ----------------------------------------
+
+# Allow PipeWire to update state
+sleep 0.05
+
+# Enforce 100% max
+clamp_volume
+
+# ---------------- OSD ----------------
+if is_muted; then
+  send_osd "Muted" 0
+else
+  VOL=$(get_volume)
+  send_osd "$VOL%" "$VOL"
+fi
 # -------------------------------------

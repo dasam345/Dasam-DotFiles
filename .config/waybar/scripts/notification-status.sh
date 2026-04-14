@@ -1,15 +1,11 @@
 #!/bin/bash
-set -euo pipefail
+# Wrapper dla swaync-client – wymagany przez waybar custom/notification
+# swaync-client -swb działa strumieniowo, waybar czyta kolejne linie
 
 if ! command -v swaync-client >/dev/null 2>&1; then
-    echo '{"text":"󰂜","tooltip":"SwayNC missing"}'
+    echo '{"text":"󰂜","tooltip":"SwayNC nie jest zainstalowany","class":"none"}'
     exit 0
 fi
 
-output=$(swaync-client -swb 2>/dev/null || true)
-if [[ -z "$output" ]]; then
-    echo '{"text":"󰂜","tooltip":"No notifications"}'
-    exit 0
-fi
-
-printf '%s' "$output"
+# Uruchom swaync-client w trybie watch – wysyła JSON przy każdej zmianie
+exec swaync-client -swb
