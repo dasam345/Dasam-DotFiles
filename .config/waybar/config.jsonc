@@ -92,7 +92,7 @@
 	    	"class<libreoffice-startcenter>": " 󰏆",
 	    	"class<libreoffice-calc>": "",
 	    	"title<.*nvim ~.*>": "",
-        "class<org.gnome.Nautilus>": "󰣆",
+        "class<dolphin|org.kde.dolphin>": "󰣆",
 	    	"title<.*vim.*>": "",
 	    	"title<.*figma.*>": "",
 	    	"title<.*jira.*>": "",
