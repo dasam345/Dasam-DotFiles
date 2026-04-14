@@ -20,7 +20,7 @@ Personal Hyprland rice for Arch Linux.
 ## Instalacja
 
 ```bash
-git clone https://github.com/dasam345/Dasam-DotFiles/tree/main.git ~/dotfiles
+git clone https://github.com/dasam345/Dasam-DotFiles.git ~/dotfiles
 cd ~/dotfiles
 chmod +x install.sh
 ./install.sh
