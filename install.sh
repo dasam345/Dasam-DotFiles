@@ -18,6 +18,7 @@ DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ────────────────────────────────────────────────────────────────
 header "1. Aktualizacja mirrorlisty i systemu"
+# ────────────────────────────────────────────────────────────────
 sudo pacman -S --noconfirm --needed reflector || true
 sudo reflector --country Poland --protocol https --latest 20 --sort rate --save /etc/pacman.d/mirrorlist || true
 sudo pacman -Syu --noconfirm
@@ -25,6 +26,7 @@ success "Mirrorlista i system zaktualizowane"
 
 # ────────────────────────────────────────────────────────────────
 header "2. Instalacja yay (AUR helper)"
+# ────────────────────────────────────────────────────────────────
 if ! command -v yay &>/dev/null; then
     sudo pacman -S --noconfirm --needed base-devel git
     git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin
@@ -37,6 +39,7 @@ fi
 
 # ────────────────────────────────────────────────────────────────
 header "3. Włączanie multilib (wymagane dla lib32-*)"
+# ────────────────────────────────────────────────────────────────
 if ! grep -q "^\[multilib\]" /etc/pacman.conf; then
     info "Włączanie multilib..."
     sudo sed -i '/^#\[multilib\]/{s/^#//;n;s/^#//}' /etc/pacman.conf
@@ -48,6 +51,7 @@ fi
 
 # ────────────────────────────────────────────────────────────────
 header "4. Hyprland core"
+# ────────────────────────────────────────────────────────────────
 sudo pacman -S --noconfirm --needed \
     hyprland \
     hyprlock \
@@ -62,6 +66,7 @@ success "Hyprland core OK"
 
 # ────────────────────────────────────────────────────────────────
 header "5. Terminal i shell"
+# ────────────────────────────────────────────────────────────────
 sudo pacman -S --noconfirm --needed \
     kitty \
     zsh \
@@ -75,17 +80,17 @@ if [ "$SHELL" != "$(which zsh)" ]; then
     chsh -s "$(which zsh)"
 fi
 
-# Oh My Zsh
+# Oh My Zsh + Powerlevel10k
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
     info "Instalacja Oh My Zsh..."
     git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
     git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
 fi
-
 success "Terminal/shell OK"
 
 # ────────────────────────────────────────────────────────────────
 header "6. Audio (Pipewire)"
+# ────────────────────────────────────────────────────────────────
 sudo pacman -S --noconfirm --needed \
     pipewire \
     pipewire-pulse \
@@ -94,13 +99,15 @@ sudo pacman -S --noconfirm --needed \
     wireplumber \
     pamixer \
     playerctl \
-    pavucontrol
+    pavucontrol \
+    pulsemixer
 
 systemctl --user enable --now pipewire pipewire-pulse wireplumber 2>/dev/null || true
 success "Audio OK"
 
 # ────────────────────────────────────────────────────────────────
 header "7. Screenshot / nagrywanie"
+# ────────────────────────────────────────────────────────────────
 sudo pacman -S --noconfirm --needed \
     grim \
     slurp \
@@ -110,8 +117,9 @@ success "Capture tools OK"
 
 # ────────────────────────────────────────────────────────────────
 header "8. AMD GPU sterowniki (RX 9060 XT)"
-# UWAGA: mesa-vdpau NIE jest osobnym pakietem – jest częścią mesa
-# lib32-libva-mesa-driver dostarcza VA-API dla 32bit (Steam)
+# ────────────────────────────────────────────────────────────────
+# mesa-vdpau NIE istnieje jako osobny pakiet – jest częścią mesa
+# lib32-libva-mesa-driver = VA-API dla 32bit (Steam)
 sudo pacman -S --noconfirm --needed \
     mesa \
     vulkan-radeon \
@@ -124,11 +132,13 @@ success "AMD GPU OK"
 
 # ────────────────────────────────────────────────────────────────
 header "9. Waybar"
+# ────────────────────────────────────────────────────────────────
 sudo pacman -S --noconfirm --needed waybar
 success "Waybar OK"
 
 # ────────────────────────────────────────────────────────────────
 header "10. Czcionki"
+# ────────────────────────────────────────────────────────────────
 sudo pacman -S --noconfirm --needed \
     ttf-jetbrains-mono-nerd \
     noto-fonts \
@@ -138,10 +148,11 @@ success "Czcionki OK"
 
 # ────────────────────────────────────────────────────────────────
 header "11. Narzędzia systemowe"
+# ────────────────────────────────────────────────────────────────
 sudo pacman -S --noconfirm --needed \
     dolphin \
     firefox \
-    steam \\
+    steam \
     brightnessctl \
     network-manager-applet \
     blueman \
@@ -153,20 +164,18 @@ sudo pacman -S --noconfirm --needed \
     ntfs-3g \
     htop \
     imagemagick \
-    pulsemixer \
-    pavucontrol \
     dconf \
     go
 success "Narzędzia systemowe OK"
 
 # ────────────────────────────────────────────────────────────────
 header "12. greetd – autologin (zastępuje SDDM/GDM)"
+# ────────────────────────────────────────────────────────────────
 sudo pacman -S --noconfirm --needed greetd
 
 CURRENT_USER=$(whoami)
 info "Konfigurowanie autologin dla: $CURRENT_USER"
 
-# Tworzymy konfig
 sudo mkdir -p /etc/greetd
 sudo tee /etc/greetd/config.toml > /dev/null << EOF
 [terminal]
@@ -181,39 +190,39 @@ command = "Hyprland"
 user = "$CURRENT_USER"
 EOF
 
-# KLUCZOWA ZMIANA: Najpierw wywalamy stare managery, potem wymuszamy greetd
 info "Usuwanie konfliktów display managerów..."
 sudo systemctl disable sddm gdm lightdm ly 2>/dev/null || true
-
-# Używamy --force, żeby nadpisać symlink /etc/systemd/system/display-manager.service
+# --force nadpisuje symlink /etc/systemd/system/display-manager.service
 sudo systemctl enable --force greetd
-
 success "greetd autologin skonfigurowany"
+
 # ────────────────────────────────────────────────────────────────
-header "13. Instalacja swww z repozytorium"
+header "13. Instalacja swww (budowanie z git)"
+# ────────────────────────────────────────────────────────────────
+# swww wymaga budowania ze źródeł – nie ma stabilnego pakietu AUR
 sudo pacman -S --noconfirm --needed \
     git \
-    meson \
-    ninja \
+    rust \
     wayland \
     wayland-protocols \
     libxkbcommon \
     pkgconf \
     libevdev \
-    libdrm
+    libdrm \
+    lz4
 
 rm -rf /tmp/swww
-git clone --depth=1 https://github.com/ammen99/swww.git /tmp/swww
+git clone --depth=1 https://github.com/LGFae/swww.git /tmp/swww
 cd /tmp/swww
-meson setup build
-ninja -C build
-sudo ninja -C build install
+cargo build --release
+sudo install -Dm755 target/release/swww /usr/local/bin/swww
+sudo install -Dm755 target/release/swww-daemon /usr/local/bin/swww-daemon
 cd "$DOTFILES_DIR"
 success "swww zainstalowany"
 
 # ────────────────────────────────────────────────────────────────
 header "14. Pakiety AUR"
-# nwg-look, swaync, swayosd, rofi-wayland, wlogout, matugen, discord – wszystkie AUR
+# ────────────────────────────────────────────────────────────────
 yay -S --noconfirm --needed \
     swaync \
     swayosd \
@@ -226,6 +235,7 @@ success "AUR OK"
 
 # ────────────────────────────────────────────────────────────────
 header "15. Kopiowanie dotfiles"
+# ────────────────────────────────────────────────────────────────
 info "Kopiowanie konfiguracji..."
 
 BACKUP_DIR="$HOME/.config-backup-$(date +%Y%m%d-%H%M%S)"
@@ -240,28 +250,24 @@ fi
 mkdir -p "$HOME/.config"
 mkdir -p "$HOME/.local/share/fonts"
 mkdir -p "$HOME/.local/share/rofi/themes"
+mkdir -p "$HOME/Wallpapers"
 
 cp -r "$DOTFILES_DIR/.config/"* "$HOME/.config/"
 cp -r "$DOTFILES_DIR/.local/"*  "$HOME/.local/"
 
 [ -f "$DOTFILES_DIR/.zshrc" ]  && cp "$DOTFILES_DIR/.zshrc"  "$HOME/.zshrc"
 [ -f "$DOTFILES_DIR/.rec.sh" ] && cp "$DOTFILES_DIR/.rec.sh" "$HOME/.rec.sh"
-
-# Utwórz katalog na tapety
-mkdir -p "$HOME/Wallpapers"
-
 success "Dotfiles skopiowane"
 
 # ────────────────────────────────────────────────────────────────
-header "15. chmod +x dla wszystkich skryptów .sh"
+header "16. chmod +x dla wszystkich skryptów .sh"
+# ────────────────────────────────────────────────────────────────
 info "Nadawanie uprawnień wykonywalnych..."
 
-# Globalnie – każdy .sh w .config i .local
 find "$HOME/.config" -name "*.sh" -exec chmod +x {} \;
 find "$HOME/.local"  -name "*.sh" -exec chmod +x {} \;
 [ -f "$HOME/.rec.sh" ] && chmod +x "$HOME/.rec.sh"
 
-# Dodatkowo explicite każdy znany skrypt
 SCRIPTS=(
     "$HOME/.config/hypr/scripts/osd.sh"
     "$HOME/.config/hypr/scripts/screenshot.sh"
@@ -270,6 +276,7 @@ SCRIPTS=(
     "$HOME/.config/hypr/scripts/mpris_osd.sh"
     "$HOME/.config/hypr/lockscripts/mpris.sh"
     "$HOME/.config/waybar/scripts/reloadwb.sh"
+    "$HOME/.config/waybar/scripts/notification-status.sh"
     "$HOME/.config/rofi/scripts/wallpaper.sh"
     "$HOME/.config/rofi/scripts/wbswitcher.sh"
     "$HOME/.config/rofi/scripts/emoji-picker.sh"
@@ -289,18 +296,21 @@ for script in "${SCRIPTS[@]}"; do
 done
 
 # ────────────────────────────────────────────────────────────────
-header "16. Odświeżanie cache czcionek"
+header "17. Odświeżanie cache czcionek"
+# ────────────────────────────────────────────────────────────────
 fc-cache -fv &>/dev/null
 success "Cache czcionek odświeżony"
 
 # ────────────────────────────────────────────────────────────────
-header "17. Info o montowaniu NTFS"
+header "18. Info o montowaniu NTFS"
+# ────────────────────────────────────────────────────────────────
 warn "Jeśli chcesz auto-mount dysku NTFS, dodaj do /etc/fstab:"
 echo "  UUID=<twoje_UUID>  /mnt/windows  ntfs-3g  uid=$(id -u),gid=$(id -g),defaults  0  0"
 echo "  Znajdź UUID: sudo blkid | grep ntfs"
 
 # ────────────────────────────────────────────────────────────────
 header "✅ Gotowe!"
+# ────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}╔══════════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║  Dotfiles zainstalowane pomyślnie!               ║${NC}"
