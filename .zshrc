@@ -116,3 +116,6 @@ source $ZSH/oh-my-zsh.sh
 
 # Fastfetch on startup
 fastfetch
+
+# opencode
+export PATH=/home/dasam/.opencode/bin:$PATH

@@ -1,127 +1,59 @@
 #!/bin/bash
-set -euo pipefail
 
-# =========================
-# Paths
-# =========================
+# 1. Środowisko - absolutnie kluczowe dla Hyprlanda
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:$HOME/.local/bin:$HOME/bin"
+set +e 
+
+# Ścieżki
 WALL_DIR="$HOME/Wallpapers"
 CACHE="$HOME/.cache/rofi-wallpapers"
 CURRENT_WALL="$HOME/.cache/current_wallpaper"
 
-if command -v swww >/dev/null 2>&1; then
-    WALLPAPER_BACKEND="swww"
-elif command -v swaybg >/dev/null 2>&1; then
-    WALLPAPER_BACKEND="swaybg"
-else
-    notify-send "Wallpaper error" "Neither swww nor swaybg is installed. Wallpaper picker disabled."
-    exit 0
-fi
-
 mkdir -p "$CACHE"
 
-# =========================
-# Generate thumbnails (static only)
-# =========================
-for img in "$WALL_DIR"/*.{jpg,jpeg,png,webp}; do
-    [ -e "$img" ] || continue
-
-    base="$(basename "$img")"
-    thumb="$CACHE/$base.png"
-
-    if [ ! -f "$thumb" ]; then
-        magick "$img" -resize 200x200 -quality 40 "$thumb"
-    fi
-done
-
-# =========================
-# Rofi menu (static + GIF)
-# =========================
-choice=$((
+# Rofi menu
+choice=$(
+    {
     for img in "$WALL_DIR"/*.{jpg,jpeg,png,webp}; do
         [ -e "$img" ] || continue
         base="$(basename "$img")"
         echo -e "$base\x00icon\x1f$CACHE/$base.png"
     done
-
     for img in "$WALL_DIR"/*.gif; do
         [ -e "$img" ] || continue
         basename "$img"
     done
-) | rofi -dmenu \
-        -theme ~/.config/rofi/wallpaper.rasi \
-        -p "Wallpaper")
+    } | rofi -dmenu -theme ~/.config/rofi/wallpaper.rasi -p "Wallpaper"
+)
 
-[ -z "$choice" ] && exit
+[ -z "$choice" ] && exit 0
 
 IMG_PATH="$WALL_DIR/$choice"
 IMG_NAME="${choice%.*}"
 
 # =========================
-# Random grow position
+# 1. Matugen - On załatwia Waybara
 # =========================
-
-RANDOM_POS="$(awk 'BEGIN {
-    srand();
-    printf "%.2f,%.2f", rand(), rand()
-}')"
+# Twój config.toml ma 'post_hook' dla waybara, więc NIE DODAJEMY pkill w skrypcie.
+matugen -c "$HOME/.config/matugen/config.toml" image "$IMG_PATH" -m dark --prefer=saturation -t scheme-tonal-spot
+sync
 
 # =========================
-# Wallpaper change (SINGLE GROW)
+# 2. Zmiana tapety (swww)
 # =========================
-if [ "$WALLPAPER_BACKEND" = "swww" ]; then
-    if ! pgrep -x swww-daemon >/dev/null 2>&1; then
-        swww-daemon &
-        sleep 0.4
-    fi
-
-    swww img "$IMG_PATH" \
-        --transition-type grow \
-        --transition-pos "$RANDOM_POS" \
-        --transition-duration 2.8 \
-        --transition-fps 60
-else
-    pkill swaybg 2>/dev/null || true
-    swaybg -i "$IMG_PATH" -m fill &
+if command -v swww >/dev/null 2>&1; then
+    pgrep -x swww-daemon >/dev/null 2>&1 || (swww-daemon & sleep 0.5)
+    RANDOM_POS="$(awk 'BEGIN { srand(); printf "%.2f,%.2f", rand(), rand() }')"
+    swww img "$IMG_PATH" --transition-type grow --transition-pos "$RANDOM_POS" --transition-duration 2.8 --transition-fps 60
 fi
 
 # =========================
-# Notify
+# 3. Odświeżanie UI (Tylko to, czego nie ma w matugen)
 # =========================
 
-(
-    sleep 1.8
-    notify-send -i "$IMG_PATH" "Wallpaper Changed" "$IMG_NAME"
-) &
+# Linkowanie tapety
+[[ "$IMG_PATH" != *.gif ]] && ln -sf "$IMG_PATH" "$CURRENT_WALL"
 
-# =========================
-# Wallpaper cache (Hyprlock-safe)
-# =========================
-# Only update cache for non-GIF wallpapers
-if [[ "$IMG_PATH" != *.gif ]]; then
-    ln -sf "$IMG_PATH" "$CURRENT_WALL"
-fi
-
-# Restart hyprlock if running
-pkill hyprlock 2>/dev/null
-
-# =========================
-# Matugen
-# =========================
-matugen image "$IMG_PATH"
-
-# =========================
-# Safe reloads
-# =========================
-
-# Reload waybar CSS only
-pkill -USR2 waybar
-
-# Close rofi cleanly
-pkill rofi
-
-# Restart SwayNC cleanly
-(
-    sleep 1
-    pkill swaync
-    swaync &
-) &
+# FIX DLA SWAYNC - Agresywne czyszczenie innych demonów i restart
+# Zabijamy mako/dunst jeśli jakimś cudem wstały
+pkill -9 mako
