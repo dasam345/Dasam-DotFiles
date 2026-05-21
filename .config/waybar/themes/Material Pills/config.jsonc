@@ -5,9 +5,9 @@
     "modules-center": [ "hyprland/workspaces", "custom/notification"],
     "modules-right":[
         "tray",
+        "custom/resources",
         "pulseaudio",
         "network",
-        "custom/resources",
     ],
 
 
@@ -219,6 +219,7 @@
         "return-type": "json",
         "interval": 5,
         "format": "{}",
-        "tooltip": true
+        "tooltip": true,
+        "on-click": "kitty --class=btop btop"
     },
 }

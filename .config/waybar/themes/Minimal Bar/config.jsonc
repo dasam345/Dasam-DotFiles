@@ -145,10 +145,10 @@
     "group/right": {
 	    "orientation": "inherit",
 	    "modules": [ 
+        "custom/resources",
         "pulseaudio",
         "custom/seprator#line",
         "network",
-        "custom/resources",
 	    ]
     },  
  
@@ -161,7 +161,8 @@
         "return-type": "json",
         "interval": 5,
         "format": "{}",
-        "tooltip": true
+        "tooltip": true,
+        "on-click": "kitty --class=btop btop"
     }
   
 }
