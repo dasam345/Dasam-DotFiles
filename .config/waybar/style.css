@@ -110,6 +110,7 @@ tooltip label{
 }
 
 #custom-notification {
+    min-width: 50px;
     color: @fg;
 }
 
