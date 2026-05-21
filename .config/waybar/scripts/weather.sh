@@ -11,7 +11,7 @@ else
     [ -n "$WEATHER" ] && echo "$WEATHER" > "$CACHE" || WEATHER=$(cat "$CACHE" 2>/dev/null)
 fi
 
-[ -z "$WEATHER" ] && printf '{"text":" ?","tooltip":"Weather unavailable","class":"normal"}\n" && exit 0
+[ -z "$WEATHER" ] && printf '{"text":" ?","tooltip":"Weather unavailable","class":"normal"}\n' && exit 0
 
 CONDITION=$(echo "$WEATHER" | awk '{print $1}')
 TEMP=$(echo "$WEATHER" | awk '{$1=""; print $0}' | xargs)
