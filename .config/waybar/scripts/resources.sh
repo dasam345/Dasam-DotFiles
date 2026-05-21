@@ -3,16 +3,24 @@
 # ── CPU usage ──────────────────────────────────────────────
 CPU=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}' | cut -d. -f1)
 
-# ── RAM usage ──────────────────────────────────────────────
+# ── RAM usage (bash-only, no bc dependency) ─────────────────
 MEM_TOTAL=$(grep MemTotal /proc/meminfo | awk '{print $2}')
 MEM_AVAIL=$(grep MemAvailable /proc/meminfo | awk '{print $2}')
-MEM_USED=$(( (MEM_TOTAL - MEM_AVAIL) / 1024 ))
-MEM_TOTAL_FMT="$(awk "BEGIN{printf \"%.1f\", $MEM_TOTAL/1024/1024}")"
-MEM_PCT=$(( 100 * (MEM_TOTAL - MEM_AVAIL) / MEM_TOTAL ))
+MEM_USED_KB=$(( MEM_TOTAL - MEM_AVAIL ))
+MEM_PCT=$(( MEM_USED_KB * 100 / MEM_TOTAL ))
 
-MEM_FMT="${MEM_USED}M"
-[ "$MEM_USED" -ge 1024 ] && MEM_FMT="$(echo "scale=1;$MEM_USED/1024" | bc)G"
-MEM_TOTAL_SHORT="${MEM_TOTAL_FMT}G"
+# Format RAM used (MB or GB)
+MEM_USED_MB=$(( MEM_USED_KB / 1024 ))
+if [ "$MEM_USED_MB" -ge 1024 ]; then
+    MEM_FMT="$(( MEM_USED_MB / 1024 )).$(( (MEM_USED_MB % 1024) * 10 / 1024 ))G"
+else
+    MEM_FMT="${MEM_USED_MB}M"
+fi
+
+# Format RAM total (GB)
+MEM_TOTAL_GB=$(( MEM_TOTAL / 1024 / 1024 ))
+MEM_TOTAL_REM=$(( (MEM_TOTAL / 1024 / 1024) * 10 + (MEM_TOTAL % (1024 * 1024)) * 10 / (1024 * 1024) ))
+MEM_TOTAL_SHORT="${MEM_TOTAL_GB}.$(( (MEM_TOTAL % (1024 * 1024)) * 10 / (1024 * 1024) ))G"
 
 # ── GPU usage ──────────────────────────────────────────────
 GPU="?"
@@ -37,6 +45,6 @@ TOOLTIP="CPU: ${CPU}%  |  RAM: ${MEM_FMT} / ${MEM_TOTAL_SHORT} (${MEM_PCT}%)"
 [ "$GPU" != "?" ] && TOOLTIP="${TOOLTIP}  |  GPU: ${GPU}%"
 
 TEXT=" ${CPU}%"
-[ "$GPU" != "?" ] && TEXT="${TEXT}  ${GPU}%"
+[ "$GPU" != "?" ] && TEXT="${TEXT}   ${GPU}%"
 
 printf '{"text":"%s","tooltip":"%s","class":"%s"}\n' "$TEXT" "$TOOLTIP" "$CLASS"
