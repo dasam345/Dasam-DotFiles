@@ -331,7 +331,7 @@ header "1. SAVING CONFIGURATION"
 mkdir -p "$HOME/.config"
 cat > "$CONFIG_FILE" << CONFIGEOF
 INSTALL_MODE=$INSTALL_MODE
-GPU=$BROWSER
+GPU=$GPU
 GPU_VAR=$GPU_VAR
 BROWSER=$BROWSER
 BROWSER_PKG=$BROWSER_PKG
@@ -370,6 +370,8 @@ else
     sed -i 's|"format": "  {:%H:%M}"|"format": "  {:%I:%M %p}"|' "$DOTFILES_DIR/.config/waybar/themes/Material Pills/config.jsonc" 2>/dev/null || true
 fi
 success "Configuration applied to dotfiles"
+success "Setting timezone to $TZ_STR..."
+sudo timedatectl set-timezone "$TZ_STR" 2>/dev/null || warn "Could not set timezone (try manually: timedatectl set-timezone $TZ_STR)"
 
 # ══════════════════════════════════════════════════════════════
 header "3. SYSTEM UPDATE"
