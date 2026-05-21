@@ -1,4 +1,4 @@
-# 🏔️ Dasam DotFiles
+# Dasam DotFiles
 
 Personal Hyprland rice for Arch Linux — interactive installer, dynamic theming (Matugen), resource monitor, and a clean Waybar layout.
 
@@ -6,7 +6,7 @@ Personal Hyprland rice for Arch Linux — interactive installer, dynamic theming
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 git clone https://github.com/dasam345/Dasam-DotFiles.git ~/dotfiles
@@ -19,7 +19,7 @@ The installer offers **3 modes** (Minimal / Standard / Full), 14 interactive pro
 
 ---
 
-## 🖥️ Hardware
+## Hardware
 
 | Component | Model |
 |-----------|-------|
@@ -30,7 +30,7 @@ The installer offers **3 modes** (Minimal / Standard / Full), 14 interactive pro
 
 ---
 
-## 🧩 Components
+## Components
 
 | Component | Description |
 |-----------|-------------|
@@ -50,12 +50,12 @@ The installer offers **3 modes** (Minimal / Standard / Full), 14 interactive pro
 
 ---
 
-## ⌨️ Keybinds
+## Keybinds
 
 **SUPER** = <kbd>⊞ Win</kbd>
 
 <details open>
-<summary><b>🚀 Launchers & Apps</b></summary>
+<summary><b>Launchers & Apps</b></summary>
 
 | Shortcut | Action |
 |----------|--------|
@@ -69,7 +69,7 @@ The installer offers **3 modes** (Minimal / Standard / Full), 14 interactive pro
 </details>
 
 <details open>
-<summary><b>🪟 Window Management</b></summary>
+<summary><b>Window Management</b></summary>
 
 | Shortcut | Action |
 |----------|--------|
@@ -84,7 +84,7 @@ The installer offers **3 modes** (Minimal / Standard / Full), 14 interactive pro
 </details>
 
 <details open>
-<summary><b>🎨 UI & Appearance</b></summary>
+<summary><b>UI & Appearance</b></summary>
 
 | Shortcut | Action |
 |----------|--------|
@@ -98,7 +98,7 @@ The installer offers **3 modes** (Minimal / Standard / Full), 14 interactive pro
 </details>
 
 <details open>
-<summary><b>🔊 Media & Hardware</b></summary>
+<summary><b>Media & Hardware</b></summary>
 
 | Shortcut | Action |
 |----------|--------|
@@ -111,27 +111,27 @@ The installer offers **3 modes** (Minimal / Standard / Full), 14 interactive pro
 
 ---
 
-## 📊 Waybar Layout
+## Waybar Layout
 
 ```
 ┌──────────┬──────────────────────────────────────┬──────────────────────────────┐
 │  Left    │              Center                  │          Right               │
 ├──────────┼──────────────────────────────────────┼──────────────────────────────┤
-│   ☀️   │  14:30  [1] [2] [3]         │     45%   75%  󰤨    │
+│ ARCH Sun │ 14:30     [1] [2] [3]    NOTIF    │ TRAY CPU 45% VOL 75% WIFI  │
 │ arch wea  │ clock   workspaces    notification  │ tray  res  audio  network     │
 └──────────┴──────────────────────────────────────┴──────────────────────────────┘
 ```
 
 **Features:**
 - **Dynamic resource monitor** — CPU, RAM, GPU (bash-only, no `bc`/`fzf`/`eza`)
-- **Weather** — auto-location via `wttr.in`, 30-min cache, Unicode emoji (`☀️ ⛅ ☁️ 🌧️`)
+- **Weather** — auto-location via `wttr.in`, 30-min cache, Unicode weather icons
 - **WiFi menu** — rofi-based `nmcli` frontend (connect + password prompt)
 - **Keybind helper** — `SUPER+H` shows all keybinds parsed from `bindings.conf`
 - **Mpris** — media player controls (Spotify, Firefox, mpv, etc.)
 
 ---
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 <details>
 <summary><b>Oh My Zsh not loaded</b></summary>
@@ -174,7 +174,7 @@ Run `matugen image ~/Wallpapers/your-wallpaper.jpg` to regenerate the color sche
 
 ---
 
-## 🙏 Credits
+## Credits
 
 - [atif-1402/anom-dots](https://github.com/atif-1402/anom-dots) — base configuration
 - [matugen](https://github.com/InioX/matugen) — dynamic color theming
