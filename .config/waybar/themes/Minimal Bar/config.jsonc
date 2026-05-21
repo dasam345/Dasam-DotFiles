@@ -2,10 +2,9 @@
     "font-family":"JetBrainsMono Nerd Font Propo", 
     "position": "top",
     "margin-top": 2,
-    "modules-left": ["custom/arch", "custom/weather", "mpris", "clock"],
-    "modules-center": ["hyprland/workspaces"],
+    "modules-left": ["custom/arch", "custom/weather", "mpris"],
+    "modules-center": ["clock", "hyprland/workspaces", "custom/notification"],
     "modules-right":[
-        "custom/notification",
         "tray",
         "group/right"
     ],

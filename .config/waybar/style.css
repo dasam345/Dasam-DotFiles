@@ -103,9 +103,15 @@ tooltip label{
 #custom-arch,
 #custom-weather {
     color: @fg;
-} 
+}
 
 #clock {
+    margin-right: auto;
+    color: @fg;
+}
+
+#custom-notification {
+    margin-left: auto;
     color: @fg;
 }
 
@@ -120,10 +126,6 @@ tooltip label{
 #network {
     color: @fg;
     margin-right: 11px;
-}
-
-#custom-notification {
-    color: @fg ;
 }
 
 #custom-resources {
