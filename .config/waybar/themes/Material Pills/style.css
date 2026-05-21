@@ -102,12 +102,10 @@ tooltip label{
 }
 
 #clock {
-    margin-right: auto;
     color: @fg;
 }
 
 #custom-notification {
-    margin-left: auto;
     color: @fg;
 }
 
