@@ -1,9 +1,10 @@
 {
     "position": "top",
     "margin-top": 4,
-    "modules-left": ["custom/arch", "custom/weather", "mpris"],
-    "modules-center": ["clock", "hyprland/workspaces", "custom/notification"],
+    "modules-left": ["custom/arch", "custom/weather", "mpris", "clock"],
+    "modules-center": ["hyprland/workspaces"],
     "modules-right":[
+        "custom/notification",
         "tray",
         "custom/resources",
         "pulseaudio",
@@ -27,7 +28,6 @@
         "return-type": "json",
         "interval": 1800,
         "format": "{}",
-        "font-family": "JetBrainsMono Nerd Font",
         "tooltip": true
     }, 
 

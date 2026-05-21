@@ -11,23 +11,23 @@ else
     [ -n "$WEATHER" ] && echo "$WEATHER" > "$CACHE" || WEATHER=$(cat "$CACHE" 2>/dev/null)
 fi
 
-[ -z "$WEATHER" ] && printf '{"text":" ?","tooltip":"Weather unavailable","class":"normal"}\n' && exit 0
+[ -z "$WEATHER" ] && printf '{"text":"☀️ ?","tooltip":"Weather unavailable","class":"normal"}\n' && exit 0
 
 CONDITION=$(echo "$WEATHER" | awk '{print $1}')
 TEMP=$(echo "$WEATHER" | awk '{$1=""; print $0}' | xargs)
 
 case "$CONDITION" in
-    *Clear*)                       ICON="" ;;
-    *Sunny*)                       ICON="" ;;
-    *Partly*cloud*)                ICON="" ;;
-    *Cloud*overcast*|*Overcast*)    ICON="" ;;
-    *Cloud*)                       ICON="" ;;
-    *Rain*|*Drizzle*|*Light*rain*) ICON="" ;;
-    *Heavy*rain*|*Downpour*)       ICON="" ;;
-    *Snow*)                        ICON="" ;;
-    *Thunder*|*Storm*)             ICON="" ;;
-    *Fog*|*Mist*|*Haze*)           ICON="" ;;
-    *)                             ICON="" ;;
+    *Clear*)                       ICON="☀️" ;;
+    *Sunny*)                       ICON="☀️" ;;
+    *Partly*cloud*)                ICON="⛅" ;;
+    *Cloud*overcast*|*Overcast*)    ICON="☁️" ;;
+    *Cloud*)                       ICON="☁️" ;;
+    *Rain*|*Drizzle*|*Light*rain*) ICON="🌧️" ;;
+    *Heavy*rain*|*Downpour*)       ICON="🌧️" ;;
+    *Snow*)                        ICON="❄️" ;;
+    *Thunder*|*Storm*)             ICON="⛈️" ;;
+    *Fog*|*Mist*|*Haze*)           ICON="🌫️" ;;
+    *)                             ICON="☀️" ;;
 esac
 
 TOOLTIP="$(curl -s "wttr.in/?format=%l:+%C,+%t,+%w&m" 2>/dev/null | head -1)"
