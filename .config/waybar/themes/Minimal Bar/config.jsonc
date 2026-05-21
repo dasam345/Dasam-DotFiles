@@ -2,8 +2,8 @@
     "font-family":"JetBrainsMono Nerd Font Propo", 
     "position": "top",
     "margin-top": 2,
-    "modules-left": ["group/left", "mpris"],
-    "modules-center": [ "hyprland/workspaces", "custom/notification"],
+    "modules-left": ["custom/arch", "custom/weather", "mpris"],
+    "modules-center": ["clock", "hyprland/workspaces", "custom/notification"],
     "modules-right":[
         "tray",
         "group/right"
@@ -12,13 +12,22 @@
 
     //MODULES//
 
-	"custom/apps": { 
-	  "format": "",
+	"custom/arch": {
+	    "exec": "~/.config/waybar/scripts/archicon.sh",
+	    "exec-if": "true",
+	    "format": "{}",
 		"font-family": "JetBrainsMono Nerd Font Propo",
 		"font-weight": 400,
 		"on-click": "~/.config/rofi/scripts/menu.sh"
-        // "on-click": "rofi -show drun"
-	}, 
+	},
+
+    "custom/weather": {
+        "exec": "~/.config/waybar/scripts/weather.sh",
+        "return-type": "json",
+        "interval": 1800,
+        "format": "{}",
+        "tooltip": true
+    }, 
 
     "clock": {
         "format": " {:%H:%M}", // 24H
@@ -76,7 +85,7 @@
      "tooltip-format-disconnected": "Disconnected",
      "interval": 3,
      "spacing": 1,
-     "on-click": "omarchy-launch-wifi"
+      "on-click": "~/.config/waybar/scripts/wifimenu.sh"
     },
 
    "custom/notification": {
@@ -132,15 +141,6 @@
 	    "ignored-players": [ "zen"],
 	    "max-length": 25,
     },
-
-    "group/left": {
-	    "orientation": "inherit",
-	    "modules": [ 
-        "custom/apps",
-        "custom/seprator#line",
-        "clock",
-	    ]
-    },    
 
     "group/right": {
 	    "orientation": "inherit",
