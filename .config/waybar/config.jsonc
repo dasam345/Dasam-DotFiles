@@ -7,17 +7,19 @@
         "tray",
         "pulseaudio",
         "network",
+        "custom/resources",
     ],
 
 
     //MODULES//
 
-	"custom/apps": { 
-	    "format": "Dasam",
+	"custom/apps": {
+	    "exec": "~/.config/waybar/scripts/nickname.sh",
+	    "exec-if": "true",
+	    "format": "{}",
 		"font-family": "JetBrainsMono Nerd Font",
 		"font-weight": 400,
 		"on-click": "~/.config/rofi/scripts/menu.sh"
-        // "on-click": "rofi -show drun"
 	}, 
 
     "clock": {
@@ -215,4 +217,12 @@
 		"tooltip": false,
         "return-type": "json"
   },
+
+    "custom/resources": {
+        "exec": "~/.config/waybar/scripts/resources.sh",
+        "return-type": "json",
+        "interval": 5,
+        "format": "{}",
+        "tooltip": true
+    },
 }

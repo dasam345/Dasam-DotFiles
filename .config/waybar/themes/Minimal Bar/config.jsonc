@@ -148,11 +148,20 @@
         "pulseaudio",
         "custom/seprator#line",
         "network",
+        "custom/resources",
 	    ]
     },  
  
     "custom/seprator#line": {
         "format": " |" 
+    },
+
+    "custom/resources": {
+        "exec": "~/.config/waybar/scripts/resources.sh",
+        "return-type": "json",
+        "interval": 5,
+        "format": "{}",
+        "tooltip": true
     }
   
 }
