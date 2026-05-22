@@ -134,6 +134,7 @@ fi
 BROWSER_NAMES=("firefox" "zen-browser" "google-chrome" "chromium" "brave-browser" "librewolf" "vivaldi" "floorp" "waterfox" "tor-browser")
 BROWSER_AUR=(false true true false true true true true true true)
 BROWSER_PKG=${BROWSER_NAMES[$((BROWSER-1))]}
+BROWSER_BIN=$BROWSER_PKG
 BROWSER_IS_AUR=${BROWSER_AUR[$((BROWSER-1))]}
 [[ "$BROWSER_IS_AUR" == "true" ]] && BROWSER_PKG="${BROWSER_PKG}-bin"
 [[ "$BROWSER_PKG" == "firefox" ]] && BROWSER_PKG="firefox"
@@ -384,7 +385,7 @@ sed -i "s/^monitor = .*/monitor = , ${RES_STR}@${MONITOR_REFRESH}, auto, 1/" "$D
 # Update hyprland.conf – keyboard layout
 sed -i "s/^    kb_layout = .*/    kb_layout = $KB_STR/" "$DOTFILES_DIR/.config/hypr/hyprland.conf"
 # Update hyprland.conf – browser
-sed -i "s|^\\\$browser = .*|\\\$browser = ${BROWSER_PKG}|" "$DOTFILES_DIR/.config/hypr/hyprland.conf"
+sed -i "s|^\\\$browser = .*|\\\$browser = ${BROWSER_BIN}|" "$DOTFILES_DIR/.config/hypr/hyprland.conf"
 # Update hyprland.conf – resource monitor
 sed -i "s|^\\\$monitor = .*|\\\$monitor = ${RM_CMD}|" "$DOTFILES_DIR/.config/hypr/hyprland.conf"
 # Update waybar time format
@@ -698,7 +699,7 @@ echo ""
 echo -e "  ${BOLD}Apps & Utils${NC}"
 echo "    SUPER+RETURN  → kitty (terminal)"
 echo "    SUPER+Q       → close window"
-echo "    SUPER+B       → $BROWSER_PKG (browser)"
+echo "    SUPER+B       → $BROWSER_BIN (browser)"
 echo "    SUPER+E       → dolphin (file manager)"
 echo "    SUPER+SPACE   → rofi (app launcher)"
 echo "    SUPER+T       → toggle floating window"
