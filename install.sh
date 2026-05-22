@@ -4,17 +4,19 @@
 # ║         for Arch Linux (Hyprland rice)                       ║
 # ╚══════════════════════════════════════════════════════════════╝
 
-set -e
+set -o pipefail
 
 # ── Colors ────────────────────────────────────────────────────
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
 BLUE='\033[0;34m'; CYAN='\033[0;36m'; BOLD='\033[1m'; NC='\033[0m'
 
-info()    { echo -e "${BLUE}[INFO]${NC} $1"; }
-success() { echo -e "${GREEN}[OK]${NC}   $1"; }
-warn()    { echo -e "${YELLOW}[WARN]${NC} $1"; }
-header()  { echo -e "\n${CYAN}══════════════════════════════════════${NC}"; echo -e "${CYAN} $1${NC}"; echo -e "${CYAN}══════════════════════════════════════${NC}"; }
-banner()  { echo -e "${CYAN}$1${NC}"; }
+LOG_FILE="/tmp/dotfiles-install-$(date +%Y%m%d-%H%M%S).log"
+log() { echo "[$(date '+%H:%M:%S')] $*" >> "$LOG_FILE"; }
+info()    { local m="$1"; echo -e "${BLUE}[INFO]${NC} $m"; log "INFO  $m"; }
+success() { local m="$1"; echo -e "${GREEN}[OK]${NC}   $m"; log "OK    $m"; }
+warn()    { local m="$1"; echo -e "${YELLOW}[WARN]${NC} $m"; log "WARN  $m"; }
+header()  { echo -e "\n${CYAN}══════════════════════════════════════${NC}"; echo -e "${CYAN} $1${NC}"; echo -e "${CYAN}══════════════════════════════════════${NC}"; log "===== $1 ====="; }
+banner()  { echo -e "${CYAN}$1${NC}"; log "$1"; }
 
 # ── Read input with default ───────────────────────────────────
 prompt_with_default() {
@@ -281,6 +283,7 @@ if [[ "$INSTALL_MODE" -eq 3 ]]; then
     info "Install gaming optimization tools?"
     echo ""
     prompt_add_app "lutris" "Game manager" GAMING_APPS
+    prompt_add_app "steam" "Valve game store & launcher" GAMING_APPS
     prompt_add_app "gamemode" "CPU/GPU optimization for games" GAMING_APPS
     prompt_add_app "mangohud" "FPS/performance overlay" GAMING_APPS
     prompt_add_app_aur "gamescope" "Micro-compositor for games" GAMING_APPS
@@ -379,7 +382,7 @@ header "3. SYSTEM UPDATE"
 info "Updating mirrorlist..."
 sudo pacman -S --noconfirm --needed reflector 2>/dev/null || true
 sudo reflector --country Poland --protocol https --latest 20 --sort rate --save /etc/pacman.d/mirrorlist 2>/dev/null || true
-sudo pacman -Syu --noconfirm
+sudo pacman -Syu --noconfirm || true
 success "System updated"
 
 # ══════════════════════════════════════════════════════════════
@@ -463,10 +466,10 @@ success "Fonts"
 
 # ── System Tools ───────────────────────────────────────────
 sudo pacman -S --noconfirm --needed \
-    dolphin firefox steam brightnessctl \
+    dolphin brightnessctl \
     network-manager-applet blueman fastfetch \
     qt5ct qt6ct xdg-utils udiskie ntfs-3g \
-    imagemagick dconf go htop
+    imagemagick dconf-cli go htop
 success "System tools"
 
 # ── Browser ────────────────────────────────────────────────
@@ -606,6 +609,15 @@ if ! grep -q "WAYBAR_NICKNAME" "$HOME/.zshrc" 2>/dev/null; then
 fi
 success "Dotfiles copied"
 
+# ── Fix hardcoded paths for non-dasam users ─────────────────
+if [[ "$USER" != "dasam" ]]; then
+    info "Fixing hardcoded paths for user '$USER'..."
+    sed -i "s|/home/dasam/|$HOME/|g" "$HOME/.config/rofi/config.rasi" 2>/dev/null || true
+    sed -i "s|/home/dasam/|$HOME/|g" "$HOME/.config/matugen/config.toml" 2>/dev/null || true
+    sed -i "s|/home/dasam/|$HOME/|g" "$HOME/.zshrc" 2>/dev/null || true
+    success "Hardcoded paths updated"
+fi
+
 # ══════════════════════════════════════════════════════════════
 header "8. SETTING EXECUTABLE PERMISSIONS"
 # ══════════════════════════════════════════════════════════════
@@ -708,3 +720,6 @@ echo -e "${YELLOW}Note:${NC} The keybind helper is also saved at:"
 echo "       ~/.config/hypr/scripts/keybinds.sh"
 echo "       Press SUPER+H in Hyprland to open it anytime."
 echo ""
+echo ""
+echo -e "${YELLOW}Installation log:${NC}"
+echo "       $LOG_FILE"
