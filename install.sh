@@ -453,7 +453,8 @@ sudo pacman -S --noconfirm --needed \
     kitty zsh zsh-completions zsh-autosuggestions \
     zsh-syntax-highlighting starship
 if [[ "$SHELL" != "$(which zsh)" ]]; then
-    chsh -s "$(which zsh)" 2>/dev/null || warn "Could not change shell (run chsh manually)"
+    grep -qx "$(which zsh)" /etc/shells 2>/dev/null || echo "$(which zsh)" | sudo tee -a /etc/shells >/dev/null
+    sudo chsh -s "$(which zsh)" "$USER" || warn "Could not change shell (run chsh manually)"
 fi
 if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
     info "Installing Oh My Zsh + Powerlevel10k..."
