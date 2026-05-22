@@ -138,27 +138,51 @@ BROWSER_IS_AUR=${BROWSER_AUR[$((BROWSER-1))]}
 [[ "$BROWSER_IS_AUR" == "true" ]] && BROWSER_PKG="${BROWSER_PKG}-bin"
 [[ "$BROWSER_PKG" == "firefox" ]] && BROWSER_PKG="firefox"
 
+# ── Auto-detect monitor ────────────────────────────────────
+if [[ -z "$RES_STR" ]] && [[ -z "$MONITOR_REFRESH" ]]; then
+    for d in /sys/class/drm/card*-*; do
+        [[ ! -f "$d/status" ]] && continue
+        [[ "$(< "$d/status")" != "connected" ]] && continue
+        mode=$(head -1 "$d/modes" 2>/dev/null)
+        [[ -z "$mode" ]] && continue
+        RES_STR="${mode%@*}"
+        if command -v edid-decode &>/dev/null && [[ -s "$d/edid" ]]; then
+            MONITOR_REFRESH=$(cat "$d/edid" | edid-decode 2>/dev/null | sed -n '/Vert frequency/s/[^0-9]//gp' | head -1)
+        fi
+        break
+    done
+fi
+
 header "MONITOR SETUP"
 echo ""
-info "Select your monitor's native resolution."
-echo ""
-if [[ -z "$MONITOR_RES" ]]; then
-    echo "  1) 1920x1080  (Full HD)"
-    echo "  2) 2560x1440  (QHD, recommended)"
-    echo "  3) 3840x2160  (4K UHD)"
-    echo "  4) 1920x1200  (WUXGA, common on laptops)"
-    echo "  5) 2560x1600  (WQXGA, common on laptops)"
-    echo "  6) Custom"
-    MONITOR_RES=$(prompt_choice "Select resolution" 2 1 6)
+if [[ -n "$RES_STR" ]] && [[ -z "$MONITOR_RES" ]]; then
+    info "Detected monitor: ${RES_STR} @ ${MONITOR_REFRESH:-?} Hz"
+    if ! prompt_yes_no "Is this correct?"; then
+        RES_STR=""
+        MONITOR_REFRESH=""
+    fi
 fi
-case $MONITOR_RES in
-    1) RES_STR="1920x1080";;
-    2) RES_STR="2560x1440";;
-    3) RES_STR="3840x2160";;
-    4) RES_STR="1920x1200";;
-    5) RES_STR="2560x1600";;
-    6) RES_STR=$(prompt_with_default "Enter custom resolution (e.g. 3440x1440)" "2560x1440");;
-esac
+if [[ -z "$RES_STR" ]]; then
+    info "Select your monitor's native resolution."
+    echo ""
+    if [[ -z "$MONITOR_RES" ]]; then
+        echo "  1) 1920x1080  (Full HD)"
+        echo "  2) 2560x1440  (QHD, recommended)"
+        echo "  3) 3840x2160  (4K UHD)"
+        echo "  4) 1920x1200  (WUXGA, common on laptops)"
+        echo "  5) 2560x1600  (WQXGA, common on laptops)"
+        echo "  6) Custom"
+        MONITOR_RES=$(prompt_choice "Select resolution" 2 1 6)
+    fi
+    case $MONITOR_RES in
+        1) RES_STR="1920x1080";;
+        2) RES_STR="2560x1440";;
+        3) RES_STR="3840x2160";;
+        4) RES_STR="1920x1200";;
+        5) RES_STR="2560x1600";;
+        6) RES_STR=$(prompt_with_default "Enter custom resolution (e.g. 3440x1440)" "2560x1440");;
+    esac
+fi
 
 if [[ -z "$MONITOR_REFRESH" ]]; then
     MONITOR_REFRESH=$(prompt_with_default "Enter your monitor refresh rate in Hz" "60")
