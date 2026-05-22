@@ -416,10 +416,13 @@ header "4. YAY (AUR HELPER)"
 if ! command -v yay &>/dev/null; then
     info "Installing yay (AUR helper)..."
     sudo pacman -S --noconfirm --needed base-devel git
-    git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin
-    cd /tmp/yay-bin && makepkg -si --noconfirm
-    cd "$DOTFILES_DIR"
-    success "yay installed"
+    if git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin; then
+        (cd /tmp/yay-bin && makepkg -si --noconfirm) || warn "makepkg failed (yay not installed)"
+        cd "$DOTFILES_DIR"
+    else
+        warn "Failed to clone yay-bin (no internet?)"
+    fi
+    command -v yay &>/dev/null && success "yay installed" || warn "yay installation failed — run: cd /tmp && git clone https://aur.archlinux.org/yay-bin.git && cd yay-bin && makepkg -si"
 else
     success "yay already installed"
 fi
